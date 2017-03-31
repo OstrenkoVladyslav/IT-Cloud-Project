@@ -1,4 +1,4 @@
-package com.brainacad.oop.students;
+package com.brainacad.oop.students.storage;
 
 public class Task {
     private String name;
