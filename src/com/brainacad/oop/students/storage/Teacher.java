@@ -1,8 +1,10 @@
 package com.brainacad.oop.students.storage;
 
-public class Teacher extends Man {
+public class Teacher {
     private static int idCounter = 0;
     private int id;
+    private String name;
+    private String surname;
 
     public Teacher(String name, String surname) {
         this.name = name;

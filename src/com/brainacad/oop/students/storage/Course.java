@@ -14,19 +14,19 @@ public final class Course {
     private String description;
     private Teacher teacher;
     private Set<Student> students;
-    private GregorianCalendar dateStart;
-    private GregorianCalendar dateEnd;
-    private daysOfWeek daysOfWeek;
-
-    private enum daysOfWeek {
-        MONDAY,
-        TUESDAY,
-        WEDNESDAY,
-        THURSDAY,
-        FRIDAY,
-        SATURDAY,
-        SUNDAY
-    }
+//    private GregorianCalendar dateStart;
+//    private GregorianCalendar dateEnd;
+//    private daysOfWeek daysOfWeek;
+//
+//    private enum daysOfWeek {
+//        MONDAY,
+//        TUESDAY,
+//        WEDNESDAY,
+//        THURSDAY,
+//        FRIDAY,
+//        SATURDAY,
+//        SUNDAY
+//    }
 
     public Course(String name, String description) {
         this.name = name;
@@ -50,17 +50,17 @@ public final class Course {
         return teacher;
     }
 
-    public GregorianCalendar getDateStart() {
-        return dateStart;
-    }
-
-    public GregorianCalendar getDateEnd() {
-        return dateEnd;
-    }
-
-    public Course.daysOfWeek getDaysOfWeek() {
-        return daysOfWeek;
-    }
+//    public GregorianCalendar getDateStart() {
+//        return dateStart;
+//    }
+//
+//    public GregorianCalendar getDateEnd() {
+//        return dateEnd;
+//    }
+//
+//    public Course.daysOfWeek getDaysOfWeek() {
+//        return daysOfWeek;
+//    }
 
     public boolean setTeacher(Teacher teacher) {
         this.teacher = teacher;
@@ -78,10 +78,6 @@ public final class Course {
                 + "\nTrainer: " + this.getTeacher());
     }
 
-//    public int hashCode() {
-//        return Objects.hash(name, description);
-//    }
-//
 //    public int compareTo(Course other) {
 //        return (id-other.getId());
 //    }

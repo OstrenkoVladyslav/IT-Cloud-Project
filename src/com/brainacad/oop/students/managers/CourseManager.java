@@ -1,7 +1,6 @@
 package com.brainacad.oop.students.managers;
 
 import com.brainacad.oop.students.storage.Course;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;

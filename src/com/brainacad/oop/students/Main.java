@@ -33,6 +33,10 @@ public class Main {
         Set<Student> students = new LinkedHashSet<>();
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
+        Runtime runtime = Runtime.getRuntime();
+        System.out.println("Free memory: " + runtime.freeMemory());
+        System.out.println("Processors: " + runtime.availableProcessors());
+
         System.out.println("Starting project \"Student\"");
         System.out.println("Please, make your choice:");
         int choice = 0;
