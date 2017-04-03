@@ -1,6 +1,6 @@
 package com.brainacad.oop.students.managers;
 
-import com.brainacad.oop.students.storage.Course;
+import com.brainacad.oop.students.model.Course;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -11,7 +11,7 @@ public class CourseManager {
     private CourseManager() {
     }
 
-    public static int addCourse(Set<Course> courses) {
+    public static int add(Set<Course> courses) {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         String name = null;
         String description = null;
@@ -53,7 +53,7 @@ public class CourseManager {
         return course.getId();
     }
 
-    public static void showCourseDetails(Set<Course> courses, int id) {
+    public static void details(Set<Course> courses, int id) {
         for (Course course : courses) {
             if (course.getId() == id) {
                 System.out.println(course);
@@ -63,12 +63,12 @@ public class CourseManager {
 
     }
 
-    public static void showCourseDetails(Set<Course> courses) {
+    public static void details(Set<Course> courses) {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int id = -1;
         boolean inputIsOK;
         do {
-            System.out.print("Enter course ID: ");
+            System.out.print("Enter course ID (0 to return): ");
             inputIsOK = false;
             try {
                 id = Integer.valueOf(br.readLine());
@@ -77,9 +77,13 @@ public class CourseManager {
                 inputIsOK = false;
                 continue;
             }
+            if (id == 0){
+                inputIsOK = true;
+                break;
+            }
             for (Course course : courses) {
                 if (course.getId() == id) {
-                    showCourseDetails(courses, id);
+                    details(courses, id);
                     inputIsOK = true;
                     break;
                 }
@@ -90,7 +94,7 @@ public class CourseManager {
         } while (!inputIsOK || id == -1);
     }
 
-    public static void showCourseList(Set<Course> courses){
+    public static void list(Set<Course> courses){
         if (courses.size()==0){
             System.out.println("Courses list is empty");
         } else {

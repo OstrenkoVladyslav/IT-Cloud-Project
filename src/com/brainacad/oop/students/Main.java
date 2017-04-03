@@ -1,9 +1,9 @@
 package com.brainacad.oop.students;
 
-import com.brainacad.oop.students.managers.CourseManager;
-import com.brainacad.oop.students.storage.Course;
-import com.brainacad.oop.students.storage.Student;
-import com.brainacad.oop.students.storage.Teacher;
+import com.brainacad.oop.students.managers.*;
+import com.brainacad.oop.students.model.Course;
+import com.brainacad.oop.students.model.Student;
+import com.brainacad.oop.students.model.Teacher;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,6 +26,8 @@ public class Main {
         System.out.println("12. Save journal to file");
         System.out.println("13. Exit");
     }
+
+    //private static resolveCommand
 
     public static void main(String[] args) {
         Set<Course> courses = new LinkedHashSet<>();
@@ -50,14 +52,41 @@ public class Main {
             }
             switch (choice) {
                 case 1:
-                    int id = CourseManager.addCourse(courses);
-                    CourseManager.showCourseDetails(courses, id);
+                    int id = CourseManager.add(courses);
+                    CourseManager.details(courses, id);
                     break;
                 case 2:
-                    CourseManager.showCourseDetails(courses);
+                    CourseManager.details(courses);
                     break;
                 case 3:
-                    CourseManager.showCourseList(courses);
+                    CourseManager.list(courses);
+                    break;
+                case 4:
+                    StudentManager.signIn();
+                    break;
+                case 5:
+                    StudentManager.move();
+                    break;
+                case 6:
+                    StudentManager.info();
+                    break;
+                case 7:
+                    TeacherManager.signIn();
+                    break;
+                case 8:
+                    TeacherManager.info();
+                    break;
+                case 9:
+                    TaskManager.add();
+                    break;
+                case 10:
+                    StudentManager.list();
+                    break;
+                case 11:
+                    JournalManager.show();
+                    break;
+                case 12:
+                    JournalManager.save();
                     break;
                 case 13:
                     System.out.println("Exiting");

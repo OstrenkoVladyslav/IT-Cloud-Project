@@ -1,4 +1,4 @@
-package com.brainacad.oop.students.storage;
+package com.brainacad.oop.students.model;
 
 public class Group {
     private int id;
