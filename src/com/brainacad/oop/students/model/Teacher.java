@@ -1,6 +1,8 @@
 package com.brainacad.oop.students.model;
 
-public class Teacher {
+import java.io.Serializable;
+
+public class Teacher implements Serializable {
     private static int idCounter = 0;
     private int id;
     private String name;

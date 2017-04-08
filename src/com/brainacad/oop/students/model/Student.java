@@ -1,8 +1,9 @@
 package com.brainacad.oop.students.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class Student {
+public class Student implements Serializable, HasID {
     private static int idCounter = 0;
     private int id;
     private String name;
@@ -11,4 +12,15 @@ public class Student {
     private Set<Group> groups;
     private Set<Task> tasks;
     private Journal journal;
+
+    public Student(String name, String surname, int age){
+        this.id = ++idCounter;
+        this.name = name;
+        this.surname = surname;
+        this.age = age;
+    }
+
+    public int getId(){
+        return id;
+    }
 }

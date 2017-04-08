@@ -2,7 +2,7 @@ package com.brainacad.oop.students.managers;
 
 public class TeacherManager {
 
-    private TeacherManager(){}
+    public TeacherManager(){}
 
     public static void signIn(){
 

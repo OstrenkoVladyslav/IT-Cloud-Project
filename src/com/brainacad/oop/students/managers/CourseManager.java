@@ -1,97 +1,57 @@
 package com.brainacad.oop.students.managers;
 
 import com.brainacad.oop.students.model.Course;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Scanner;
 import java.util.Set;
 
 public class CourseManager {
 
-    private CourseManager() {
+    public CourseManager() {
     }
 
-    public static int add(Set<Course> courses) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        String name = null;
-        String description = null;
-        System.out.println("Creating new course");
-        boolean inputIsOK;
-
+    public Course create(Scanner scanner) {
+        String name, description;
+        LocalDate startDate = null, endDate = null;
+        System.out.println("Enter course name:");
+        name = scanner.nextLine();
+        System.out.println("Enter course description:");
+        description = scanner.nextLine();
+        Boolean inputIsOk;
+        Boolean rangeIsOk;
         do {
-            System.out.print("Please input course name: ");
-            inputIsOK = true;
-            try {
-                name = br.readLine();
-            } catch (IOException e) {
-                System.out.println("IOException. Try again.");
-                inputIsOK = false;
-                continue;
-            }
-            for (Course course : courses) {
-                if (name.equals(course.getName())) {
-                    System.out.println("Course name should be unique. Please, enter another name.");
-                    inputIsOK = false;
-                    break;
+            do {
+                System.out.println("Input course start date in format yyyy-mm-dd");
+                inputIsOk = true;
+                try {
+                    startDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ISO_LOCAL_DATE);
+                } catch (DateTimeParseException e) {
+                    System.out.println("Wrong input. Try again.");
+                    inputIsOk = false;
                 }
-            }
-        } while (!inputIsOK);
-
-        do {
-            System.out.print("Please input course description: ");
-            inputIsOK = true;
-            try {
-                description = br.readLine();
-            } catch (IOException e) {
-                System.out.println("IOException. Try again.");
-                inputIsOK = false;
-            }
-        } while (!inputIsOK || name == null || description == null);
-        Course course = new Course(name, description);
-        courses.add(course);
-        System.out.println("Course created OK");
-        return course.getId();
-    }
-
-    public static void details(Set<Course> courses, int id) {
-        for (Course course : courses) {
-            if (course.getId() == id) {
-                System.out.println(course);
-                break;
-            }
-        }
-
-    }
-
-    public static void details(Set<Course> courses) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        int id = -1;
-        boolean inputIsOK;
-        do {
-            System.out.print("Enter course ID (0 to return): ");
-            inputIsOK = false;
-            try {
-                id = Integer.valueOf(br.readLine());
-            } catch (IOException | NumberFormatException e) {
-                System.out.println("Input error. Try again.");
-                inputIsOK = false;
-                continue;
-            }
-            if (id == 0){
-                inputIsOK = true;
-                break;
-            }
-            for (Course course : courses) {
-                if (course.getId() == id) {
-                    details(courses, id);
-                    inputIsOK = true;
-                    break;
+            } while (!inputIsOk);
+            do {
+                System.out.println("Input course end date in format yyyy-mm-dd");
+                inputIsOk = true;
+                try {
+                    endDate = LocalDate.parse(scanner.nextLine(), DateTimeFormatter.ISO_LOCAL_DATE);
+                } catch (DateTimeParseException e) {
+                    System.out.println("Wrong input. Try again.");
+                    inputIsOk = false;
                 }
+            } while (!inputIsOk);
+
+            if (startDate.compareTo(endDate) > 0) {
+                rangeIsOk = false;
+                System.out.println("Date range is wrong. Try again.");
+            } else {
+                rangeIsOk = true;
             }
-            if (!inputIsOK) {
-                System.out.println("No such course. Try once more.");
-            }
-        } while (!inputIsOK || id == -1);
+        } while (!rangeIsOk);
+
+        return new Course(name, description, startDate, endDate);
     }
 
     public static void list(Set<Course> courses){

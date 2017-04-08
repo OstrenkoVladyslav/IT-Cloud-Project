@@ -1,20 +1,26 @@
 package com.brainacad.oop.students;
 
-import com.brainacad.oop.students.managers.*;
+import com.brainacad.oop.students.dao.collection.CollectionDao;
+import com.brainacad.oop.students.dao.collection.CourseCollectionDao;
+import com.brainacad.oop.students.dao.collection.StudentCollectionDao;
+import com.brainacad.oop.students.managers.CourseManager;
+import com.brainacad.oop.students.managers.StudentManager;
+import com.brainacad.oop.students.managers.TeacherManager;
 import com.brainacad.oop.students.model.Course;
 import com.brainacad.oop.students.model.Student;
-import com.brainacad.oop.students.model.Teacher;
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.time.LocalDate;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
-    private static void fillStartMenu() {
-        System.out.println("1.  Create course");
-        System.out.println("2.  Show course details");
-        System.out.println("3.  All courses list");
+    private static void listCommands() {
+        System.out.println("List of available commands:");
+        System.out.println("\"create course\": creates new course");
+        System.out.println("\"show course #\": shows course detail by id");
+        System.out.println("\"show courses\": shows all courses details");
         System.out.println("4.  Sign in student");
         System.out.println("5.  Move student");
         System.out.println("6.  Student info");
@@ -27,74 +33,92 @@ public class Main {
         System.out.println("13. Exit");
     }
 
-    //private static resolveCommand
+    //private static resolveCommand(){}
 
     public static void main(String[] args) {
-        Set<Course> courses = new LinkedHashSet<>();
-        Set<Teacher> teachers = new LinkedHashSet<>();
-        Set<Student> students = new LinkedHashSet<>();
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        CourseManager courseManager = new CourseManager();
+        StudentManager studentManager = new StudentManager();
+        TeacherManager teacherManager = new TeacherManager();
 
-        Runtime runtime = Runtime.getRuntime();
-        System.out.println("Free memory: " + runtime.freeMemory());
-        System.out.println("Processors: " + runtime.availableProcessors());
+        CollectionDao<Student> studentDao = new StudentCollectionDao();
+        CollectionDao<Course> courseDao = new CourseCollectionDao();
 
-        System.out.println("Starting project \"Student\"");
-        System.out.println("Please, make your choice:");
-        int choice = 0;
+        Scanner scanner = new Scanner(System.in);
+        String commandString;
+
+        //Input test courses
+        courseDao.create(new Course("Course name 1", "Description 1", LocalDate.of(2016, 2, 12), LocalDate.of(2016, 3, 16)));
+        courseDao.create(new Course("Course name 2", "Description 2", LocalDate.of(2017, 2, 12), LocalDate.of(2017, 3, 16)));
+
+        Pattern ptrnCreateCourse = Pattern.compile("create\\s+course|cc", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnShowCourse = Pattern.compile("(show\\s+course)|(sc)\\s+(?<id>\\d+)", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnShowCourses = Pattern.compile("show\\s+courses|ss", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnHelp = Pattern.compile("help|[?]", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnExit = Pattern.compile("exit|quit|[q]", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnCreateStudent = Pattern.compile("create\\s+student|cs", Pattern.CASE_INSENSITIVE);
+
+
+        System.out.println("Starting project \"Student\" (by Ostrenko V.)");
+        boolean exit = false;
+
         do {
-            fillStartMenu();
-            try {
-                choice = Integer.parseInt(br.readLine());
-            } catch (IOException | NumberFormatException e) {
-                System.out.println("Invalid input. Try again.");
+            System.out.println("Please, enter command:");
+            commandString = scanner.nextLine();
+            Matcher matcherExit = ptrnExit.matcher(commandString);
+            Matcher matcherHelp = ptrnHelp.matcher(commandString);
+            Matcher matcherCreateCourse = ptrnCreateCourse.matcher(commandString);
+            Matcher matcherShowCourse = ptrnShowCourse.matcher(commandString);
+            Matcher matcherShowCourses = ptrnShowCourses.matcher(commandString);
+            Matcher matcherCreateStudent = ptrnCreateStudent.matcher(commandString);
+
+            //List of available commands
+            if (matcherHelp.matches()) {
+                listCommands();
                 continue;
             }
-            switch (choice) {
-                case 1:
-                    int id = CourseManager.add(courses);
-                    CourseManager.details(courses, id);
-                    break;
-                case 2:
-                    CourseManager.details(courses);
-                    break;
-                case 3:
-                    CourseManager.list(courses);
-                    break;
-                case 4:
-                    StudentManager.signIn();
-                    break;
-                case 5:
-                    StudentManager.move();
-                    break;
-                case 6:
-                    StudentManager.info();
-                    break;
-                case 7:
-                    TeacherManager.signIn();
-                    break;
-                case 8:
-                    TeacherManager.info();
-                    break;
-                case 9:
-                    TaskManager.add();
-                    break;
-                case 10:
-                    StudentManager.list();
-                    break;
-                case 11:
-                    JournalManager.show();
-                    break;
-                case 12:
-                    JournalManager.save();
-                    break;
-                case 13:
-                    System.out.println("Exiting");
-                    break;
-                default: {
-                    System.out.println("Wrong command. Try again.");
-                }
+
+            //Create the course
+            if (matcherCreateCourse.matches()) {
+                System.out.println("CREATE COURSE");
+                Course newCourse = courseManager.create(scanner);
+                courseDao.create(newCourse);
+                System.out.printf("New course was succesfully created:\n%s\n", newCourse);
+                continue;
             }
-        } while (choice != 13);
+
+            //Show the course by id
+            if (matcherShowCourse.matches()) {
+                System.out.println("SHOW COURSE");
+                Course tempCourse = courseDao.read(Integer.parseInt(matcherShowCourse.group("id")));
+                String report = (tempCourse == null) ? "No such course" : tempCourse.toString();
+                System.out.println(report);
+                continue;
+            }
+
+            //Show all courses
+            if (matcherShowCourses.matches()) {
+                System.out.println("SHOW ALL COURSES");
+                Set<Course> tempCourse = courseDao.getCollection();
+                int i = 1;
+                for (Course c : tempCourse) {
+                    System.out.println(i++ + ". " + c.getName());
+                }
+                continue;
+            }
+
+            //Create the student
+            if (matcherCreateStudent.matches()) {
+                Student tempStudent = studentManager.create(scanner);
+            }
+
+            //Exit the program
+            if (matcherExit.matches()) {
+                System.out.println("Exiting...");
+                exit = true;
+            }
+
+            System.out.println("Unknown command");
+
+        } while (!exit);
     }
 }
