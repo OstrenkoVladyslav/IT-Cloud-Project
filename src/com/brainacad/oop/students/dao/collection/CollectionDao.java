@@ -40,13 +40,13 @@ public class CollectionDao<T extends HasID> implements Dao<T> {
     }
 
     @Override
-    public T getId(int id) {
-        return null;
+    public Set<T> getCollection() {
+        return new HashSet<>(set);
     }
 
     @Override
-    public Set<T> getCollection() {
-        return new HashSet<>(set);
+    public void clearDb() {
+        System.out.println("Not applicable for collections");
     }
 
     public int getSize(){

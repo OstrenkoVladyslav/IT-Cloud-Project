@@ -2,7 +2,7 @@ package com.brainacad.oop.students.model;
 
 import java.io.Serializable;
 
-public class Teacher implements Serializable {
+public class Teacher implements Serializable, HasID {
     private static int idCounter = 0;
     private int id;
     private String name;
@@ -17,5 +17,10 @@ public class Teacher implements Serializable {
     @Override
     public String toString() {
         return (String.format("id: %d. %s %s", id, surname, name));
+    }
+
+    @Override
+    public int getId() {
+        return id;
     }
 }

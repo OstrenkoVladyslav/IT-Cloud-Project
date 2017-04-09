@@ -3,6 +3,9 @@ package com.brainacad.oop.students;
 import com.brainacad.oop.students.dao.collection.CollectionDao;
 import com.brainacad.oop.students.dao.collection.CourseCollectionDao;
 import com.brainacad.oop.students.dao.collection.StudentCollectionDao;
+import com.brainacad.oop.students.dao.database.CourseDbDao;
+import com.brainacad.oop.students.dao.database.DbDao;
+import com.brainacad.oop.students.dao.database.StudentDbDao;
 import com.brainacad.oop.students.managers.CourseManager;
 import com.brainacad.oop.students.managers.StudentManager;
 import com.brainacad.oop.students.managers.TeacherManager;
@@ -10,6 +13,7 @@ import com.brainacad.oop.students.model.Course;
 import com.brainacad.oop.students.model.Student;
 import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 
+import java.sql.*;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -30,7 +34,8 @@ public class Main {
         System.out.println("10. All students list");
         System.out.println("11. Grades journal");
         System.out.println("12. Save journal to file");
-        System.out.println("13. Exit");
+        System.out.println("\"clear db\": clears database");
+        System.out.println("\"quit\": quit program");
     }
 
     //private static resolveCommand(){}
@@ -40,15 +45,11 @@ public class Main {
         StudentManager studentManager = new StudentManager();
         TeacherManager teacherManager = new TeacherManager();
 
-        CollectionDao<Student> studentDao = new StudentCollectionDao();
-        CollectionDao<Course> courseDao = new CourseCollectionDao();
+        DbDao<Student> studentDao = new StudentDbDao();
+        DbDao<Course> courseDao = new CourseDbDao();
 
         Scanner scanner = new Scanner(System.in);
         String commandString;
-
-        //Input test courses
-        courseDao.create(new Course("Course name 1", "Description 1", LocalDate.of(2016, 2, 12), LocalDate.of(2016, 3, 16)));
-        courseDao.create(new Course("Course name 2", "Description 2", LocalDate.of(2017, 2, 12), LocalDate.of(2017, 3, 16)));
 
         Pattern ptrnCreateCourse = Pattern.compile("create\\s+course|cc", Pattern.CASE_INSENSITIVE);
         Pattern ptrnShowCourse = Pattern.compile("(show\\s+course)|(sc)\\s+(?<id>\\d+)", Pattern.CASE_INSENSITIVE);
@@ -56,6 +57,8 @@ public class Main {
         Pattern ptrnHelp = Pattern.compile("help|[?]", Pattern.CASE_INSENSITIVE);
         Pattern ptrnExit = Pattern.compile("exit|quit|[q]", Pattern.CASE_INSENSITIVE);
         Pattern ptrnCreateStudent = Pattern.compile("create\\s+student|cs", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnClearDb = Pattern.compile("clear\\s+db|cdb", Pattern.CASE_INSENSITIVE);
+
 
 
         System.out.println("Starting project \"Student\" (by Ostrenko V.)");
@@ -70,6 +73,7 @@ public class Main {
             Matcher matcherShowCourse = ptrnShowCourse.matcher(commandString);
             Matcher matcherShowCourses = ptrnShowCourses.matcher(commandString);
             Matcher matcherCreateStudent = ptrnCreateStudent.matcher(commandString);
+            Matcher matcherClearDv = ptrnClearDb.matcher(commandString);
 
             //List of available commands
             if (matcherHelp.matches()) {
@@ -109,12 +113,22 @@ public class Main {
             //Create the student
             if (matcherCreateStudent.matches()) {
                 Student tempStudent = studentManager.create(scanner);
+                studentDao.create(tempStudent);
+                continue;
+            }
+
+            //Clear databases
+            if (matcherClearDv.matches()){
+                courseDao.clearDb();
+                studentDao.clearDb();
+                continue;
             }
 
             //Exit the program
             if (matcherExit.matches()) {
                 System.out.println("Exiting...");
                 exit = true;
+                continue;
             }
 
             System.out.println("Unknown command");

@@ -20,12 +20,7 @@ public class StudentCollectionDao extends CollectionDao<Student> {
 
     @Override
     public Student read(int id) {
-        for (Student student : students) {
-            if (student.getId() == id) {
-                return student;
-            }
-        }
-        return null;
+        return super.read(id);
     }
 
     @Override
@@ -36,10 +31,5 @@ public class StudentCollectionDao extends CollectionDao<Student> {
     @Override
     public void delete(int t) {
 
-    }
-
-    @Override
-    public Student getId(int id) {
-        return null;
     }
 }

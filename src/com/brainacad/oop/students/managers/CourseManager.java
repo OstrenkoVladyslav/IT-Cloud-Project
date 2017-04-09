@@ -14,6 +14,7 @@ public class CourseManager {
 
     public Course create(Scanner scanner) {
         String name, description;
+        int teacherId;
         LocalDate startDate = null, endDate = null;
         System.out.println("Enter course name:");
         name = scanner.nextLine();
@@ -51,7 +52,14 @@ public class CourseManager {
             }
         } while (!rangeIsOk);
 
-        return new Course(name, description, startDate, endDate);
+        inputIsOk = true;
+        do {
+            System.out.println("Input teacher id:");
+            teacherId = scanner.nextInt();
+
+        } while (!inputIsOk);
+
+        return new Course(name, description, teacherId, startDate, endDate);
     }
 
     public static void list(Set<Course> courses){

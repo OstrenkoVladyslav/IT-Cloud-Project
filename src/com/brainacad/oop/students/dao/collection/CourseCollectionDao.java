@@ -24,9 +24,4 @@ public class CourseCollectionDao extends CollectionDao<Course> {
     public void delete(int t) {
 
     }
-
-    @Override
-    public Course getId(int id) {
-        return null;
-    }
 }

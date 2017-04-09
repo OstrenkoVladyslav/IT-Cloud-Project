@@ -3,29 +3,24 @@ package com.brainacad.oop.students.dao.database;
 import com.brainacad.oop.students.dao.Dao;
 import com.brainacad.oop.students.model.HasID;
 
+import java.sql.*;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 public class DbDao<T extends HasID> implements Dao<T> {
     private Collection<T> set;
+    private ResultSet resultSet;
 
     DbDao() {
-        set = new HashSet<>();
     }
 
     @Override
     public void create(T t) {
-        this.set.add(t);
+        //this.set.add(t);
     }
 
     @Override
     public T read(int id) {
-        for (T t : set) {
-            if (t.getId() == id) {
-                return t;
-            }
-        }
         return null;
     }
 
@@ -34,18 +29,17 @@ public class DbDao<T extends HasID> implements Dao<T> {
 
     }
 
-    @Override
+    @Override //TODO not realized
     public void delete(int id) {
 
     }
 
     @Override
-    public T getId(int id) {
+    public Set<T> getCollection() {
         return null;
     }
 
     @Override
-    public Set<T> getCollection() {
-        return null;
+    public void clearDb() {
     }
 }
