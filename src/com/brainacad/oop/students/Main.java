@@ -1,19 +1,23 @@
 package com.brainacad.oop.students;
 
-import com.brainacad.oop.students.dao.collection.CollectionDao;
-import com.brainacad.oop.students.dao.collection.CourseCollectionDao;
-import com.brainacad.oop.students.dao.collection.StudentCollectionDao;
+import com.brainacad.oop.students.dao.Dao;
+import com.brainacad.oop.students.dao.collection.*;
 import com.brainacad.oop.students.dao.database.CourseDbDao;
 import com.brainacad.oop.students.dao.database.DbDao;
 import com.brainacad.oop.students.dao.database.StudentDbDao;
+import com.brainacad.oop.students.dao.database.TeacherDbDao;
 import com.brainacad.oop.students.managers.CourseManager;
+import com.brainacad.oop.students.managers.CourseStudentManager;
 import com.brainacad.oop.students.managers.StudentManager;
 import com.brainacad.oop.students.managers.TeacherManager;
 import com.brainacad.oop.students.model.Course;
+import com.brainacad.oop.students.model.CourseStudent;
 import com.brainacad.oop.students.model.Student;
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
+import com.brainacad.oop.students.model.Teacher;
 
-import java.sql.*;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -25,40 +29,62 @@ public class Main {
         System.out.println("\"create course\": creates new course");
         System.out.println("\"show course #\": shows course detail by id");
         System.out.println("\"show courses\": shows all courses details");
-        System.out.println("4.  Sign in student");
-        System.out.println("5.  Move student");
-        System.out.println("6.  Student info");
-        System.out.println("7.  Sign in teacher");
-        System.out.println("8.  Teacher info");
-        System.out.println("9.  Create task");
-        System.out.println("10. All students list");
-        System.out.println("11. Grades journal");
-        System.out.println("12. Save journal to file");
+        System.out.println("\"create student\": create new student");
+        System.out.println("\"enroll student # (add|remove) #\": (un)enroll student #id to course #id");
+        System.out.println("UNREALIZED YET Student info");
+        System.out.println("UNREALIZED YET Sign in teacher");
+        System.out.println("UNREALIZED YET Teacher info");
+        System.out.println("UNREALIZED YET Create task");
+        System.out.println("UNREALIZED YET All students list");
+        System.out.println("UNREALIZED YET Grades journal");
+        System.out.println("UNREALIZED YET Save journal to file");
         System.out.println("\"clear db\": clears database");
         System.out.println("\"quit\": quit program");
     }
 
-    //private static resolveCommand(){}
+    public static void fillTeachers(Dao<Teacher> teacherDao) {
+        teacherDao.add(new Teacher("Sidor", "Kolobkov"));
+        teacherDao.add(new Teacher("Mikhail", "Potapov"));
+        teacherDao.add(new Teacher("Leopold", "Kotovsky"));
+    }
+
+    public static void fillCourses(Dao<Course> courseDao) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        try {
+            courseDao.add(new Course("Java", "Java for beginners", 1, df.parse("2017-04-12"), df.parse("2017-04-12")));
+            courseDao.add(new Course("C#", "C# for seniors", 2, df.parse("2017-01-30"), df.parse("2017-04-12")));
+            courseDao.add(new Course("Scala", "All about Scala", 3, df.parse("2017-01-30"), df.parse("2017-04-12")));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void main(String[] args) {
         CourseManager courseManager = new CourseManager();
         StudentManager studentManager = new StudentManager();
         TeacherManager teacherManager = new TeacherManager();
+        CourseStudentManager courseStudentManager = new CourseStudentManager();
 
-        DbDao<Student> studentDao = new StudentDbDao();
-        DbDao<Course> courseDao = new CourseDbDao();
+        Dao<Student> studentDao = new StudentDbDao();
+        Dao<Course> courseDao = new CourseDbDao();
+        Dao<Teacher> teacherDao = new TeacherDbDao();
+        Dao<CourseStudent> courseStudentDao = new CourseStudentCollectionDao();
+
+//      for test purposes
+//        fillTeachers(teacherDao);
+//        fillCourses(courseDao);
 
         Scanner scanner = new Scanner(System.in);
         String commandString;
 
-        Pattern ptrnCreateCourse = Pattern.compile("create\\s+course|cc", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnCreateCourse = Pattern.compile("(create\\s+course)|(cc)", Pattern.CASE_INSENSITIVE);
         Pattern ptrnShowCourse = Pattern.compile("(show\\s+course)|(sc)\\s+(?<id>\\d+)", Pattern.CASE_INSENSITIVE);
-        Pattern ptrnShowCourses = Pattern.compile("show\\s+courses|ss", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnShowCourses = Pattern.compile("(show\\s+courses)|(ss)", Pattern.CASE_INSENSITIVE);
         Pattern ptrnHelp = Pattern.compile("help|[?]", Pattern.CASE_INSENSITIVE);
         Pattern ptrnExit = Pattern.compile("exit|quit|[q]", Pattern.CASE_INSENSITIVE);
-        Pattern ptrnCreateStudent = Pattern.compile("create\\s+student|cs", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnCreateStudent = Pattern.compile("(create\\s+student)|(cs)", Pattern.CASE_INSENSITIVE);
+        Pattern ptrnEnrollStudent = Pattern.compile("(enroll\\s+student)|(es)\\s+(?<studentId>\\d+)\\s+(?<courseId>\\d+)", Pattern.CASE_INSENSITIVE);
         Pattern ptrnClearDb = Pattern.compile("clear\\s+db|cdb", Pattern.CASE_INSENSITIVE);
-
 
 
         System.out.println("Starting project \"Student\" (by Ostrenko V.)");
@@ -73,6 +99,7 @@ public class Main {
             Matcher matcherShowCourse = ptrnShowCourse.matcher(commandString);
             Matcher matcherShowCourses = ptrnShowCourses.matcher(commandString);
             Matcher matcherCreateStudent = ptrnCreateStudent.matcher(commandString);
+            Matcher matcherEnrollStudent = ptrnEnrollStudent.matcher(commandString);
             Matcher matcherClearDv = ptrnClearDb.matcher(commandString);
 
             //List of available commands
@@ -83,16 +110,14 @@ public class Main {
 
             //Create the course
             if (matcherCreateCourse.matches()) {
-                System.out.println("CREATE COURSE");
                 Course newCourse = courseManager.create(scanner);
-                courseDao.create(newCourse);
+                courseDao.add(newCourse);
                 System.out.printf("New course was succesfully created:\n%s\n", newCourse);
                 continue;
             }
 
             //Show the course by id
             if (matcherShowCourse.matches()) {
-                System.out.println("SHOW COURSE");
                 Course tempCourse = courseDao.read(Integer.parseInt(matcherShowCourse.group("id")));
                 String report = (tempCourse == null) ? "No such course" : tempCourse.toString();
                 System.out.println(report);
@@ -101,24 +126,29 @@ public class Main {
 
             //Show all courses
             if (matcherShowCourses.matches()) {
-                System.out.println("SHOW ALL COURSES");
                 Set<Course> tempCourse = courseDao.getCollection();
-                int i = 1;
-                for (Course c : tempCourse) {
-                    System.out.println(i++ + ". " + c.getName());
-                }
+                courseManager.list(tempCourse);
                 continue;
             }
 
             //Create the student
             if (matcherCreateStudent.matches()) {
                 Student tempStudent = studentManager.create(scanner);
-                studentDao.create(tempStudent);
+                studentDao.add(tempStudent);
+                continue;
+            }
+
+            //Enroll student to course
+            if (matcherEnrollStudent.matches()) {
+                int studentId = Integer.parseInt(matcherEnrollStudent.group("studentId"));
+                int courseId = Integer.parseInt(matcherEnrollStudent.group("courseId"));
+                CourseStudent cs = courseStudentManager.create(courseId, studentId);
+                courseStudentDao.add(cs);
                 continue;
             }
 
             //Clear databases
-            if (matcherClearDv.matches()){
+            if (matcherClearDv.matches()) {
                 courseDao.clearDb();
                 studentDao.clearDb();
                 continue;

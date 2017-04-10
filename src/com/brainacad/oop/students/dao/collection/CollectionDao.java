@@ -1,63 +1,49 @@
 package com.brainacad.oop.students.dao.collection;
 
 import com.brainacad.oop.students.dao.Dao;
-import com.brainacad.oop.students.model.HasID;
 
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
-public class CollectionDao<T extends HasID> implements Dao<T> {
+public abstract class CollectionDao<T> implements Dao<T> {
     private Collection<T> set;
 
     CollectionDao() {
-        set = new HashSet<>();
+        set = new LinkedHashSet<>();
     }
 
     @Override
-    public void create(T t) {
+    public boolean add(T t) {
         this.set.add(t);
+        return true;
     }
 
     @Override
-    public T read(int id) {
-        for (T t : set) {
-            if (t.getId() == id) {
-                return t;
-            }
-        }
-        return null;
-    }
+    public abstract T read(int id);
 
     @Override
     public void update(T t) {
 
     }
 
-    @Override
+    @Override //TODO not realized
     public void delete(int id) {
 
     }
 
     @Override
     public Set<T> getCollection() {
-        return new HashSet<>(set);
+        return new LinkedHashSet<>(set);
+    }
+
+    @Override
+    public int getSize(){
+        return set.size();
     }
 
     @Override
     public void clearDb() {
         System.out.println("Not applicable for collections");
-    }
-
-    public int getSize(){
-        return set.size();
-    }
-
-    public boolean hasNext(){
-        return set.iterator().hasNext();
-    }
-
-    public T next(){
-        return set.iterator().next();
     }
 }

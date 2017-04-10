@@ -9,7 +9,6 @@ public class Student implements Serializable, HasID {
     private String name;
     private String surname;
     private int age;
-    private Set<Group> groups;
     private Set<Task> tasks;
     private Journal journal;
 

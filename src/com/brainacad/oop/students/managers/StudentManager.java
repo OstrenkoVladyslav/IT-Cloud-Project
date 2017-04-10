@@ -22,7 +22,7 @@ public class StudentManager {
         name = scanner.nextLine();
         System.out.println("Enter student's surname:");
         surname = scanner.nextLine();
-        boolean inputIsOk = true;
+        boolean inputIsOk;
         do {
             inputIsOk = true;
             try {
@@ -40,10 +40,6 @@ public class StudentManager {
             }
         } while (!inputIsOk);
         return new Student(name, surname, age);
-    }
-
-    public static int add(Set<Student> students) {
-        return 0;
     }
 
     public static void signIn() {

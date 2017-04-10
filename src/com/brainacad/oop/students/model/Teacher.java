@@ -14,6 +14,14 @@ public class Teacher implements Serializable, HasID {
         this.id = ++idCounter;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
     @Override
     public String toString() {
         return (String.format("id: %d. %s %s", id, surname, name));
@@ -23,4 +31,6 @@ public class Teacher implements Serializable, HasID {
     public int getId() {
         return id;
     }
+
+
 }

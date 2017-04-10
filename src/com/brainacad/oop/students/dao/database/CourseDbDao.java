@@ -2,10 +2,17 @@ package com.brainacad.oop.students.dao.database;
 
 import com.brainacad.oop.students.model.Course;
 
-import java.sql.*;
-import java.time.LocalDate;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
-import java.util.HashSet;
+import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -17,7 +24,7 @@ public class CourseDbDao extends DbDao<Course> {
 
     @Override
     public Course read(int id) {
-        String query = String.format("SELECT FROM courses WHERE id=%d", id);
+        String query = String.format("SELECT * FROM courses WHERE id=%s", id);
         Course course = null;
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:./database.db");
              Statement statement = connection.createStatement()) {
@@ -25,54 +32,62 @@ public class CourseDbDao extends DbDao<Course> {
             if (resultSet.next()) {
                 String name = resultSet.getString("name");
                 String description = resultSet.getString("description");
-                int teacher = resultSet.getInt("teacher");
+                int teacherId = resultSet.getInt("teacher");
                 String startDate_String = resultSet.getString("startdate");
-                String enddate_String = resultSet.getString("enddate");
-                LocalDate startDate = LocalDate.parse(startDate_String, DateTimeFormatter.ISO_LOCAL_DATE);
-                LocalDate endDate = LocalDate.parse(enddate_String, DateTimeFormatter.ISO_LOCAL_DATE);
-                course = new Course(name, description, teacher, startDate, endDate);
+                String endDate_String = resultSet.getString("enddate");
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                Date startDate = df.parse(startDate_String);
+                Date endDate = df.parse(endDate_String);
+                course = new Course(id, name, description, teacherId, startDate, endDate);
             }
-        } catch (SQLException e) {
+        } catch (SQLException|ParseException e) {
             e.printStackTrace();
         }
         return course;
     }
 
     @Override
-    public void create(Course course) {
-        String query = String.format("INSERT INTO courses (name,description,startdate,enddate) VALUES ('%s','%s','%s','%s')", course.getName(), course.getDescription(), course.getStartDate().format(DateTimeFormatter.ISO_LOCAL_DATE), course.getEndDate().format(DateTimeFormatter.ISO_LOCAL_DATE));
+    public boolean add(Course course) {
+        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+        String startDate = df.format(course.getStartDate());
+        String endDate = df.format(course.getEndDate());
+        String query = String.format("INSERT INTO courses (name,description,startdate,enddate) VALUES ('%s','%s','%s','%s')",
+                course.getName(), course.getDescription(), startDate, endDate);
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:./database.db");
              Statement statement = connection.createStatement()) {
             statement.executeUpdate(query);
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        return true;
     }
 
-    //@Override
+    @Override
     public void update(Course course) {
         //return null;
     }
 
     @Override
     public Set<Course> getCollection() {
-        Set<Course> collection = new HashSet<>();
-        String query = "SELECT * FROM courses";
+        Set<Course> collection = new LinkedHashSet<>();
+        String query = "SELECT * FROM courses ORDER BY id";
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:./database.db");
              Statement statement = connection.createStatement()) {
             ResultSet resultSet = statement.executeQuery(query);
 
             while (resultSet.next()) {
+                int id = resultSet.getInt("id");
                 String name = resultSet.getString("name");
                 String description = resultSet.getString("description");
-                int teacher = resultSet.getInt("teacher");
+                int teacherId = resultSet.getInt("teacher");
                 String startDate_String = resultSet.getString("startdate");
                 String enddate_String = resultSet.getString("enddate");
-                LocalDate startDate = LocalDate.parse(startDate_String, DateTimeFormatter.ISO_LOCAL_DATE);
-                LocalDate endDate = LocalDate.parse(enddate_String, DateTimeFormatter.ISO_LOCAL_DATE);
-                collection.add(new Course(name, description, teacher, startDate, endDate));
+                DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                Date startDate = df.parse(startDate_String);
+                Date endDate = df.parse(enddate_String);
+                collection.add(new Course(id, name, description, teacherId, startDate, endDate));
             }
-        } catch (SQLException e) {
+        } catch (SQLException|ParseException e) {
             e.printStackTrace();
         }
         return collection;
@@ -93,6 +108,20 @@ public class CourseDbDao extends DbDao<Course> {
             }
             System.out.println("Database Courses cleared");
         }
+    }
+
+    @Override
+    public int getSize(){
+        int size = 0;
+        String query = "SELECT COUNT(*) FROM courses";
+        try (Connection connection = DriverManager.getConnection("jdbc:sqlite:./database.db");
+             Statement statement = connection.createStatement()) {
+            ResultSet resultSet = statement.executeQuery(query);
+            size = resultSet.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return size;
     }
 
     @Override //TODO not realized

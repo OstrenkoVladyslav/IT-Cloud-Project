@@ -12,16 +12,11 @@ public class CourseCollectionDao extends CollectionDao<Course> {
 
     @Override
     public Course read(int id) {
-        return super.read(id);
-    }
-
-    //@Override
-    public void update(Course t) {
-        //return null;
-    }
-
-    @Override
-    public void delete(int t) {
-
+        for (Course course : this.getCollection()) {
+            if (course.getId() == id) {
+                return course;
+            }
+        }
+        return null;
     }
 }
